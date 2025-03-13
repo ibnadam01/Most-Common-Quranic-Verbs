@@ -23,6 +23,27 @@
     .option-eng {
       font-size: 100px;
     }
+    /* Default option style (applies to Arabic-to-English quiz) */
+    .option {
+      background: #f0f0f0;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      font-size: 80px;
+      color: #333;
+    }
+    .option:hover {
+      background: #e0e0e0;
+      transform: scale(1.02);
+    }
+    .option.correct {
+      background: #a5d6a7;
+    }
+    .option.wrong {
+      background: #ef9a9a;
+    }
     /* Full-page background slideshow using fixed images */
     body {
       margin: 0;
@@ -170,47 +191,24 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    /* Options styling */
-    .options {
-      list-style-type: none;
-      padding: 0;
-    }
-    .option {
-      background: #f0f0f0;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      font-size: 80px; /* Default for Arabic-to-English quiz */
-      color: #333;
-    }
-    .option:hover {
-      background: #e0e0e0;
-      transform: scale(1.02);
-    }
-    .option.correct {
-      background: #a5d6a7;
-    }
-    .option.wrong {
-      background: #ef9a9a;
-    }
-    .summary {
-      font-size: 24px;
-      color: #333;
-    }
-    .btn {
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      background: #4caf50;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .btn:hover {
-      background: #45a049;
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .main-wrapper {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      .content {
+        padding: 10px;
+      }
+      .quiz-container {
+        max-width: 100%;
+      }
     }
   </style>
 </head>

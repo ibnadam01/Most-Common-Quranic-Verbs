@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aydan's Verb Quiz</title>
+  <title>Quranic Verbs Quiz</title>
   <!-- Fallback font for English text -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
   <!-- Canvas Confetti for fun effects -->
@@ -15,7 +15,15 @@
       src: url('KFGQPC%20Uthmanic%20Script%20HAFS%20Regular.otf') format('opentype');
       font-weight: bold;
     }
-    /* Full-page slideshow background with fixed Islamic-themed images */
+    /* Use Uthmanic font for Arabic answer options */
+    .arabic-option {
+      font-family: 'Uthmanic', 'Cairo', sans-serif;
+    }
+    /* For English-to-Arabic quiz options, override font size */
+    .option-eng {
+      font-size: 100px;
+    }
+    /* Full-page background slideshow using fixed images */
     body {
       margin: 0;
       padding: 0;
@@ -32,49 +40,94 @@
       66% { background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3c/Mosque_of_Omar_Istanbul.jpg'); }
       100% { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ed/Kaaba_Mecca.jpg'); }
     }
-    /* Kid-friendly quiz container styling with a bright border */
+    /* Main wrapper holds the sidebar and content area */
+    .main-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+    /* Sidebar styling */
+    .sidebar {
+      width: 200px;
+      background: #f9f9f9;
+      border-right: 2px solid #ddd;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .quiz-selector {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .quiz-selector:hover {
+      background: #45a049;
+    }
+    /* Content area styling */
+    .content {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    /* Common quiz container styling */
     .quiz-container {
       background: rgba(255, 255, 255, 0.95);
-      border: 5px solid #ffeb3b;  /* Bright yellow border */
+      border: 5px solid #ffeb3b;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      width: 90%;
       max-width: 600px;
+      margin: 0 auto;
       padding: 20px;
-      margin: 30px auto;
       text-align: center;
       animation: fadeIn 1s ease-in-out;
+    }
+    .hidden {
+      display: none;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
     }
-    h1 {
-      margin-top: 0;
-      font-size: 36px;
+    h1, h2, h3 {
       color: #333;
+      margin: 0;
     }
-    /* Friendly tagline for kids */
+    /* Page Header */
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 36px;
+    }
+    /* Extra title for left quiz table */
+    .table-title {
+      margin-bottom: 10px;
+      font-size: 22px;
+      color: #555;
+    }
     .tagline {
       font-size: 20px;
       color: #d32f2f;
       margin-bottom: 15px;
       font-weight: bold;
     }
-    /* Status bar for live counters */
-    #status {
+    /* Status, timer, and progress bar styles */
+    .status {
       font-size: 18px;
       margin-bottom: 5px;
       color: #333;
     }
-    /* Timer display styling */
-    #timer {
+    .timer {
       font-size: 20px;
       margin-bottom: 10px;
       color: #d32f2f;
       font-weight: bold;
     }
-    /* Progress bar styling */
     .progress-bar {
       width: 100%;
       background: #ddd;
@@ -89,7 +142,7 @@
       background: #4caf50;
       transition: width 0.5s;
     }
-    /* Arabic question styling using your Uthmanic font */
+    /* Arabic question styling (for Arabic-to-English quiz) */
     .question {
       font-family: 'Uthmanic', 'Cairo', sans-serif;
       font-weight: bold;
@@ -104,7 +157,20 @@
       70% { transform: scale(0.9); }
       100% { transform: scale(1); }
     }
-    /* Answer options styling with larger English text */
+    /* English question styling (for English-to-Arabic quiz) */
+    .question-eng {
+      font-family: 'Cairo', sans-serif;
+      font-weight: bold;
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #222;
+      animation: fadeInUp 0.8s;
+    }
+    @keyframes fadeInUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    /* Options styling */
     .options {
       list-style-type: none;
       padding: 0;
@@ -116,7 +182,7 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background 0.3s, transform 0.2s;
-      font-size: 32px;
+      font-size: 80px; /* Default for Arabic-to-English quiz */
       color: #333;
     }
     .option:hover {
@@ -149,27 +215,62 @@
   </style>
 </head>
 <body>
-  <!-- Sound effects -->
+  <h1>Quranic Verbs Quiz</h1>
+  <div class="main-wrapper">
+    <!-- Sidebar with quiz selection buttons -->
+    <div class="sidebar">
+      <button id="btn-eng" class="quiz-selector">English to Arabic</button>
+      <button id="btn-arabic" class="quiz-selector">Arabic to English</button>
+    </div>
+    <!-- Content area for the selected quiz -->
+    <div class="content">
+      <!-- English-to-Arabic Quiz Container -->
+      <div id="quiz-english" class="quiz-container">
+        <h2>English to Arabic Quiz</h2>
+        <h3 class="table-title">Find the Arabic Verb for the Meaning</h3>
+        <div id="status-eng" class="status">Correct: 0, Wrong: 0, Remaining: 47</div>
+        <div id="timer-eng" class="timer"></div>
+        <div class="progress-bar">
+          <div class="progress" id="progress-eng"></div>
+        </div>
+        <div id="quiz-eng"></div>
+      </div>
+      <!-- Arabic-to-English Quiz Container (initially hidden) -->
+      <div id="quiz-arabic" class="quiz-container hidden">
+        <h2>Arabic to English Quiz</h2>
+        <div class="tagline">Select the correct English meaning for the given verb!</div>
+        <div id="status-arabic" class="status">Correct: 0, Wrong: 0, Remaining: 47</div>
+        <div id="timer-arabic" class="timer"></div>
+        <div class="progress-bar">
+          <div class="progress" id="progress-arabic"></div>
+        </div>
+        <div id="quiz-arabic-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Audio Elements -->
   <audio id="click-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
   <audio id="correct-sound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
   <audio id="wrong-sound" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg"></audio>
 
-  <div class="quiz-container">
-    <h1>Aydan's Verb Quiz</h1>
-    <div class="tagline">Let's learn Arabic verbs in a fun way! Tap the right answer before time runs out!</div>
-    <div id="status">Correct: 0, Wrong: 0, Remaining: 47</div>
-    <div id="timer"></div>
-    <div class="progress-bar">
-      <div class="progress" id="progress"></div>
-    </div>
-    <div id="quiz">
-      <!-- Quiz content will be injected here by JavaScript -->
-    </div>
-  </div>
-
   <script>
-    // List of 47 Arabic verbs with their English meanings
-    const verbs = [
+    /*************** Utility Function to Remove Shadda from First Letter ***************/
+    function removeShaddaFromFirstLetter(word) {
+      if (!word) return word;
+      // Find the end of the first letter's diacritics.
+      let i = 1;
+      while (i < word.length && /[\u064B-\u0652]/.test(word[i])) {
+          i++;
+      }
+      // Remove all occurrences of shadda (U+0651) from the first letter's segment.
+      let firstSegment = word.slice(0, i);
+      let modifiedSegment = firstSegment.replace(/\u0651/g, '');
+      return modifiedSegment + word.slice(i);
+    }
+
+    /*************** Shared Verb Data ***************/
+    let verbs = [
       { arabic: "قَالَ", english: "To say" },
       { arabic: "كَانَ", english: "To be" },
       { arabic: "ءَامَنَ", english: "To believe" },
@@ -219,14 +320,16 @@
       { arabic: "أَنفَقَ", english: "To spend" }
     ];
 
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let wrongCount = 0;
-    let questions = [];
-    let timerDuration = 15; // seconds per question
-    let timerInterval;
+    // Remove shadda from the first letter of each Arabic verb
+    verbs = verbs.map(v => ({
+      arabic: removeShaddaFromFirstLetter(v.arabic),
+      english: v.english
+    }));
 
-    // Utility: Shuffle an array
+    /*************** English-to-Arabic Quiz Functions ***************/
+    let currentQuestionIndexEng = 0, scoreEng = 0, wrongCountEng = 0, questionsEng = [];
+    let timerDurationEng = 15, timerIntervalEng;
+
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -235,13 +338,164 @@
       return array;
     }
 
-    // Prepare questions with one correct answer and three random incorrect options
-    function prepareQuestions() {
-      const shuffledVerbs = shuffle([...verbs]);
-      questions = shuffledVerbs.map(verb => {
-        const incorrectOptions = verbs.filter(v => v.english !== verb.english);
-        shuffle(incorrectOptions);
-        const options = incorrectOptions.slice(0, 3).map(opt => opt.english);
+    function prepareQuestionsEng() {
+      const shuffled = shuffle([...verbs]);
+      questionsEng = shuffled.map(verb => {
+        // For English-to-Arabic: question: English meaning; answer options: Arabic verbs.
+        // Only two incorrect choices plus the correct answer (3 options total)
+        const incorrect = verbs.filter(v => v.arabic !== verb.arabic);
+        shuffle(incorrect);
+        const options = incorrect.slice(0, 2).map(opt => opt.arabic);
+        options.push(verb.arabic);
+        return {
+          english: verb.english,
+          correct: verb.arabic,
+          options: shuffle(options)
+        };
+      });
+    }
+
+    function updateStatusEng() {
+      const remaining = questionsEng.length - currentQuestionIndexEng;
+      document.getElementById('status-eng').textContent = `Correct: ${scoreEng}, Wrong: ${wrongCountEng}, Remaining: ${remaining}`;
+    }
+
+    function startTimerEng() {
+      clearInterval(timerIntervalEng);
+      let timeLeft = timerDurationEng;
+      document.getElementById('timer-eng').textContent = `Time Left: ${timeLeft}s`;
+      timerIntervalEng = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer-eng').textContent = `Time Left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerIntervalEng);
+          forceNextQuestionEng();
+        }
+      }, 1000);
+    }
+
+    function forceNextQuestionEng() {
+      const opts = document.querySelectorAll('#quiz-eng .option');
+      opts.forEach(opt => opt.style.pointerEvents = 'none');
+      opts.forEach(opt => {
+        if (opt.textContent === questionsEng[currentQuestionIndexEng].correct) {
+          opt.classList.add('correct');
+        }
+      });
+      setTimeout(() => {
+        currentQuestionIndexEng++;
+        showQuestionEng();
+      }, 1500);
+    }
+
+    function showQuestionEng() {
+      updateStatusEng();
+      clearInterval(timerIntervalEng);
+      const quizDiv = document.getElementById('quiz-eng');
+      quizDiv.innerHTML = '';
+      if (currentQuestionIndexEng >= questionsEng.length) {
+        showSummaryEng();
+        return;
+      }
+      startTimerEng();
+      const qObj = questionsEng[currentQuestionIndexEng];
+      // For English-to-Arabic quiz, question is English
+      const qEl = document.createElement('div');
+      qEl.className = 'question-eng';
+      qEl.textContent = qObj.english;
+      quizDiv.appendChild(qEl);
+      const optionsList = document.createElement('ul');
+      optionsList.className = 'options';
+      qObj.options.forEach(option => {
+        const li = document.createElement('li');
+        // Use .option, .option-eng and .arabic-option to ensure the Arabic text appears at 100px for this quiz
+        li.className = 'option arabic-option option-eng';
+        li.textContent = option;
+        li.addEventListener('click', () => selectOptionEng(li, qObj.correct));
+        optionsList.appendChild(li);
+      });
+      quizDiv.appendChild(optionsList);
+      updateProgressBarEng();
+    }
+
+    function selectOptionEng(selectedEl, correctAnswer) {
+      clearInterval(timerIntervalEng);
+      document.getElementById('click-sound').play();
+      const opts = document.querySelectorAll('#quiz-eng .option');
+      opts.forEach(opt => opt.style.pointerEvents = 'none');
+      if (selectedEl.textContent === correctAnswer) {
+        selectedEl.classList.add('correct');
+        scoreEng++;
+        document.getElementById('correct-sound').play();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      } else {
+        selectedEl.classList.add('wrong');
+        wrongCountEng++;
+        document.getElementById('wrong-sound').play();
+        opts.forEach(opt => {
+          if (opt.textContent === correctAnswer) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      updateStatusEng();
+      setTimeout(() => {
+        currentQuestionIndexEng++;
+        showQuestionEng();
+      }, 1500);
+    }
+
+    function updateProgressBarEng() {
+      const progress = document.getElementById('progress-eng');
+      const percent = (currentQuestionIndexEng / questionsEng.length) * 100;
+      progress.style.width = percent + '%';
+    }
+
+    function showSummaryEng() {
+      clearInterval(timerIntervalEng);
+      updateStatusEng();
+      const quizDiv = document.getElementById('quiz-eng');
+      quizDiv.innerHTML = '';
+      const summaryEl = document.createElement('div');
+      summaryEl.className = 'summary';
+      summaryEl.innerHTML = `
+        <h2>Awesome Job, Champ!</h2>
+        <p>You got ${scoreEng} correct and ${wrongCountEng} wrong answers.</p>
+        <p>You answered ${questionsEng.length} questions in total.</p>
+      `;
+      quizDiv.appendChild(summaryEl);
+      const restartBtn = document.createElement('button');
+      restartBtn.className = 'btn';
+      restartBtn.textContent = 'Play Again, Champ!';
+      restartBtn.addEventListener('click', () => {
+        document.getElementById('click-sound').play();
+        restartQuizEng();
+      });
+      quizDiv.appendChild(restartBtn);
+      document.getElementById('progress-eng').style.width = '100%';
+      document.getElementById('timer-eng').textContent = '';
+    }
+
+    function restartQuizEng() {
+      currentQuestionIndexEng = 0;
+      scoreEng = 0;
+      wrongCountEng = 0;
+      prepareQuestionsEng();
+      showQuestionEng();
+    }
+
+    /*************** Arabic-to-English Quiz Functions ***************/
+    let currentQuestionIndexArab = 0, scoreArab = 0, wrongCountArab = 0, questionsArab = [];
+    let timerDurationArab = 15, timerIntervalArab;
+
+    function prepareQuestionsArab() {
+      const shuffled = shuffle([...verbs]);
+      questionsArab = shuffled.map(verb => {
+        // For Arabic-to-English: question: Arabic verb; answer options: English meanings.
+        // Only two incorrect choices plus the correct answer (3 options total)
+        const incorrect = verbs.filter(v => v.english !== verb.english);
+        shuffle(incorrect);
+        const options = incorrect.slice(0, 2).map(opt => opt.english);
         options.push(verb.english);
         return {
           arabic: verb.arabic,
@@ -251,118 +505,112 @@
       });
     }
 
-    // Update live status: correct, wrong, remaining
-    function updateStatus() {
-      const remaining = questions.length - currentQuestionIndex;
-      document.getElementById('status').textContent = `Correct: ${score}, Wrong: ${wrongCount}, Remaining: ${remaining}`;
+    function updateStatusArab() {
+      const remaining = questionsArab.length - currentQuestionIndexArab;
+      document.getElementById('status-arabic').textContent = `Correct: ${scoreArab}, Wrong: ${wrongCountArab}, Remaining: ${remaining}`;
     }
 
-    // Start or reset the countdown timer
-    function startTimer() {
-      clearInterval(timerInterval);
-      let timeLeft = timerDuration;
-      document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
-      timerInterval = setInterval(() => {
+    function startTimerArab() {
+      clearInterval(timerIntervalArab);
+      let timeLeft = timerDurationArab;
+      document.getElementById('timer-arabic').textContent = `Time Left: ${timeLeft}s`;
+      timerIntervalArab = setInterval(() => {
         timeLeft--;
-        document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+        document.getElementById('timer-arabic').textContent = `Time Left: ${timeLeft}s`;
         if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          forceNextQuestion();
+          clearInterval(timerIntervalArab);
+          forceNextQuestionArab();
         }
       }, 1000);
     }
 
-    // Force move to next question if time runs out
-    function forceNextQuestion() {
-      const options = document.querySelectorAll('.option');
-      options.forEach(option => option.style.pointerEvents = 'none');
-      options.forEach(option => {
-        if (option.textContent === questions[currentQuestionIndex].correct) {
-          option.classList.add('correct');
+    function forceNextQuestionArab() {
+      const opts = document.querySelectorAll('#quiz-arabic-content .option');
+      opts.forEach(opt => opt.style.pointerEvents = 'none');
+      opts.forEach(opt => {
+        if (opt.textContent === questionsArab[currentQuestionIndexArab].correct) {
+          opt.classList.add('correct');
         }
       });
       setTimeout(() => {
-        currentQuestionIndex++;
-        showQuestion();
+        currentQuestionIndexArab++;
+        showQuestionArab();
       }, 1500);
     }
 
-    // Display the current question
-    function showQuestion() {
-      updateStatus();
-      clearInterval(timerInterval);
-      const quizDiv = document.getElementById('quiz');
+    function showQuestionArab() {
+      updateStatusArab();
+      clearInterval(timerIntervalArab);
+      const quizDiv = document.getElementById('quiz-arabic-content');
       quizDiv.innerHTML = '';
-      if (currentQuestionIndex >= questions.length) {
-        showSummary();
+      if (currentQuestionIndexArab >= questionsArab.length) {
+        showSummaryArab();
         return;
       }
-      startTimer();
-      const questionObj = questions[currentQuestionIndex];
-      const questionEl = document.createElement('div');
-      questionEl.className = 'question';
-      questionEl.textContent = questionObj.arabic;
-      quizDiv.appendChild(questionEl);
+      startTimerArab();
+      const qObj = questionsArab[currentQuestionIndexArab];
+      // For Arabic-to-English quiz, question is Arabic
+      const qEl = document.createElement('div');
+      qEl.className = 'question';
+      qEl.textContent = qObj.arabic;
+      quizDiv.appendChild(qEl);
       const optionsList = document.createElement('ul');
       optionsList.className = 'options';
-      questionObj.options.forEach(option => {
+      qObj.options.forEach(option => {
         const li = document.createElement('li');
         li.className = 'option';
         li.textContent = option;
-        li.addEventListener('click', () => selectOption(li, questionObj.correct));
+        li.addEventListener('click', () => selectOptionArab(li, qObj.correct));
         optionsList.appendChild(li);
       });
       quizDiv.appendChild(optionsList);
-      updateProgressBar();
+      updateProgressBarArab();
     }
 
-    // Process selected answer, play sounds, update score, and trigger confetti if correct
-    function selectOption(selectedElement, correctAnswer) {
-      clearInterval(timerInterval);
+    function selectOptionArab(selectedEl, correctAnswer) {
+      clearInterval(timerIntervalArab);
       document.getElementById('click-sound').play();
-      const options = document.querySelectorAll('.option');
-      options.forEach(option => option.style.pointerEvents = 'none');
-      if (selectedElement.textContent === correctAnswer) {
-        selectedElement.classList.add('correct');
-        score++;
+      const opts = document.querySelectorAll('#quiz-arabic-content .option');
+      opts.forEach(opt => opt.style.pointerEvents = 'none');
+      if (selectedEl.textContent === correctAnswer) {
+        selectedEl.classList.add('correct');
+        scoreArab++;
         document.getElementById('correct-sound').play();
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       } else {
-        selectedElement.classList.add('wrong');
-        wrongCount++;
+        selectedEl.classList.add('wrong');
+        wrongCountArab++;
         document.getElementById('wrong-sound').play();
-        options.forEach(option => {
-          if (option.textContent === correctAnswer) {
-            option.classList.add('correct');
+        opts.forEach(opt => {
+          if (opt.textContent === correctAnswer) {
+            opt.classList.add('correct');
           }
         });
       }
-      updateStatus();
+      updateStatusArab();
       setTimeout(() => {
-        currentQuestionIndex++;
-        showQuestion();
+        currentQuestionIndexArab++;
+        showQuestionArab();
       }, 1500);
     }
 
-    // Update progress bar width
-    function updateProgressBar() {
-      const progress = document.getElementById('progress');
-      const progressPercent = (currentQuestionIndex / questions.length) * 100;
-      progress.style.width = progressPercent + '%';
+    function updateProgressBarArab() {
+      const progress = document.getElementById('progress-arabic');
+      const percent = (currentQuestionIndexArab / questionsArab.length) * 100;
+      progress.style.width = percent + '%';
     }
 
-    // Display summary at the end with a friendly message
-    function showSummary() {
-      clearInterval(timerInterval);
-      updateStatus();
-      const quizDiv = document.getElementById('quiz');
+    function showSummaryArab() {
+      clearInterval(timerIntervalArab);
+      updateStatusArab();
+      const quizDiv = document.getElementById('quiz-arabic-content');
       quizDiv.innerHTML = '';
       const summaryEl = document.createElement('div');
       summaryEl.className = 'summary';
       summaryEl.innerHTML = `
         <h2>Awesome Job, Champ!</h2>
-        <p>You got ${score} correct and ${wrongCount} wrong answers.</p>
-        <p>You answered ${questions.length} questions in total.</p>
+        <p>You got ${scoreArab} correct and ${wrongCountArab} wrong answers.</p>
+        <p>You answered ${questionsArab.length} questions in total.</p>
       `;
       quizDiv.appendChild(summaryEl);
       const restartBtn = document.createElement('button');
@@ -370,24 +618,38 @@
       restartBtn.textContent = 'Play Again, Champ!';
       restartBtn.addEventListener('click', () => {
         document.getElementById('click-sound').play();
-        restartQuiz();
+        restartQuizArab();
       });
       quizDiv.appendChild(restartBtn);
-      document.getElementById('progress').style.width = '100%';
-      document.getElementById('timer').textContent = '';
+      document.getElementById('progress-arabic').style.width = '100%';
+      document.getElementById('timer-arabic').textContent = '';
     }
 
-    function restartQuiz() {
-      currentQuestionIndex = 0;
-      score = 0;
-      wrongCount = 0;
-      prepareQuestions();
-      showQuestion();
+    function restartQuizArab() {
+      currentQuestionIndexArab = 0;
+      scoreArab = 0;
+      wrongCountArab = 0;
+      prepareQuestionsArab();
+      showQuestionArab();
     }
 
-    // Initialize the quiz on page load
-    prepareQuestions();
-    showQuestion();
+    /*************** Sidebar Button Handlers ***************/
+    document.getElementById('btn-eng').addEventListener('click', function() {
+      document.getElementById('quiz-english').classList.remove('hidden');
+      document.getElementById('quiz-arabic').classList.add('hidden');
+      restartQuizEng();
+    });
+    document.getElementById('btn-arabic').addEventListener('click', function() {
+      document.getElementById('quiz-arabic').classList.remove('hidden');
+      document.getElementById('quiz-english').classList.add('hidden');
+      restartQuizArab();
+    });
+
+    /*************** Initialize Quizzes on Page Load ***************/
+    prepareQuestionsEng();
+    showQuestionEng();
+    prepareQuestionsArab();
+    // By default, the English-to-Arabic quiz is shown.
   </script>
 </body>
 </html>
